@@ -19,7 +19,7 @@ export class InstancedPolygons  {
     this.clearBuffers();
     this.createGlBuffers();
     this.bindSharedVAs();
-    this.bindMainPolygonVAs();
+    this.updatePolygonBuffer();
 
     this.setCoords(getEarcutVertices(vertices));
     this.setOutlineCoords(lineImplAttributes(vertices));
@@ -36,14 +36,14 @@ export class InstancedPolygons  {
     this.outlineCoords = lineVertices;
     this.outlineDirections = lineDirections;
     console.log(`outlineCoords.length, outlineDirections.length: ${this.outlineCoords.length}, ${this.outlineDirections.length}`);
-    this.updateOutlineCoordBuffer();
+    this.updateOutlineBuffers();
   }
 
   setCornerCoords({cornerVertices, cornerDirections}) {
     this.cornerCoords = cornerVertices;
     this.cornerDirections = cornerDirections;
     console.log(`cornerCoords.length, cornerDirections.length: ${this.cornerCoords.length}, ${this.cornerDirections.length}`);
-    this.updateCornerCoordBuffer();
+    this.updateCornerBuffers();
   }
 
   createGlBuffers() {
@@ -61,19 +61,19 @@ export class InstancedPolygons  {
     this.colorBuffer = this.gl.createBuffer();
   }
 
-  bindMainPolygonVAs() {
+  updatePolygonBuffer() {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.coordBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.coords), this.gl.STATIC_DRAW);
   }
 
-  bindPolygonOutlineVAs() {
+  updateOutlineBuffers() {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.coordBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.outlineCoords), this.gl.STATIC_DRAW);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.outlineDirectionBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.outlineDirections), this.gl.STATIC_DRAW);
   }
   
-  bindPolygonCornerVAs() {
+  updateCornerBuffers() {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.coordBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.cornerCoords), this.gl.STATIC_DRAW);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.outlineDirectionBuffer);
@@ -146,24 +146,6 @@ export class InstancedPolygons  {
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.coords), this.gl.STATIC_DRAW);
   }
 
-  updateOutlineCoordBuffer() {
-    this.shader.use();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.coordBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.outlineCoords), this.gl.STATIC_DRAW);
-
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.outlineDirectionBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.outlineDirections), this.gl.STATIC_DRAW);
-  }
-
-  updateCornerCoordBuffer() {
-    this.shader.use();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.coordBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.cornerCoords), this.gl.STATIC_DRAW);
-
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.outlineDirectionBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.cornerDirections), this.gl.STATIC_DRAW);
-  }
-
   updateRotationBuffer() {
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.rotationBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.rotations), this.gl.STATIC_DRAW);
@@ -198,11 +180,6 @@ export class InstancedPolygons  {
     if (instanceCount === 0) {
       return;
     }
-
-    // this.bindSharedVAs();
-
-    this.gl.createVertexArray();
-
     this.shader.use();
     this.shader.setFloat("u_polygon_count", Math.abs(maxDepthIndex));
 
@@ -210,17 +187,17 @@ export class InstancedPolygons  {
 
     // 1. main polygon
     this.shader.setFloat("u_draw_outline", 0.0);
-    this.bindMainPolygonVAs();
+    this.updatePolygonBuffer();
     this.gl.drawArraysInstanced(this.gl.TRIANGLES, 0, this.coords.length / 2, instanceCount);
 
     // 2. outline
     this.shader.setFloat("u_draw_outline", 1.0);
-    this.bindPolygonOutlineVAs();
+    this.updateOutlineBuffers();
     this.gl.drawArraysInstanced(this.gl.TRIANGLES, 0, this.outlineCoords.length / 2, instanceCount);
 
     // 3. corners
     this.shader.setFloat("u_draw_outline", 2.0);
-    this.bindPolygonCornerVAs();
+    this.updateCornerBuffers();
     this.gl.drawArraysInstanced(this.gl.TRIANGLES, 0, this.cornerCoords.length / 2, instanceCount);
   }
 }
