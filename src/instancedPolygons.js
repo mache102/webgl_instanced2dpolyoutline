@@ -100,7 +100,7 @@ export class InstancedPolygons  {
     this.gl.enableVertexAttribArray(this.rotationLoc);
   
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.sizeBuffer);
-    this.gl.vertexAttribPointer(this.sizeLoc, 1, this.gl.FLOAT, false, 0, 0);
+    this.gl.vertexAttribPointer(this.sizeLoc, 2, this.gl.FLOAT, false, 0, 0);
     this.gl.enableVertexAttribArray(this.sizeLoc);
   
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.offsetBuffer);
@@ -125,12 +125,15 @@ export class InstancedPolygons  {
     this.offsets = [];
     this.colors = [];
   }
-
   // adds an instance of the polygon to the buffer and returns the updated index
   addInstance(index, rotation, size, offset, color) {
     this.indexs.push(index);
     this.rotations.push(rotation);
-    this.sizes.push(size);
+    if (size instanceof vec2) {
+      this.sizes.push(size.x, size.y);
+    } else {
+      this.sizes.push(size, size);
+    }
     this.offsets.push(offset.x, offset.y);
     this.colors.push(color.r, color.g, color.b, color.a);
   }

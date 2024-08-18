@@ -53,7 +53,7 @@ let polygonColors = [
 let polygonCount = 2000;
 
 let minSize = 2;
-let maxSize = 20;
+let maxSize = 30;
 
 function radians(degrees) {
   return degrees * Math.PI / 180;
@@ -188,52 +188,16 @@ function init() {
 
   let time = performance.now();
   for (let i = 0; i < polygonCount; i++) {
-    renderManager.addInstance({
-      name: 'star',
-      rotation: i * 2 * Math.PI / 360.0,
-      size: Math.random() * (maxSize - minSize) + minSize,
-      offset: getRandCoord(canvas),
-      color: polygonColors[Math.floor(Math.random() * polygonColors.length)]
-    });
+    let rotation = i * 2 * Math.PI / 360.0;
+    let size = new vec2(Math.random() * (maxSize - minSize) + minSize, Math.random() * (maxSize - minSize) + minSize);
+    let color = polygonColors[Math.floor(Math.random() * polygonColors.length)];
 
-    renderManager.addInstance({
-      name: 'square',
-      rotation: i * 2 * Math.PI / 360.0,
-      size: Math.random() * (maxSize - minSize) + minSize,
-      offset: getRandCoord(canvas),
-      color: polygonColors[Math.floor(Math.random() * polygonColors.length)]
-    });
-
-    renderManager.addInstance({
-      name: 'triangle',
-      rotation: i * 2 * Math.PI / 360.0,
-      size: Math.random() * (maxSize - minSize) + minSize,
-      offset: getRandCoord(canvas),
-      color: polygonColors[Math.floor(Math.random() * polygonColors.length)]
-    });
-
-    renderManager.addInstance({
-      name: 'pentagon',
-      rotation: i * 2 * Math.PI / 360.0,
-      size: Math.random() * (maxSize - minSize) + minSize,
-      offset: getRandCoord(canvas),
-      color: polygonColors[Math.floor(Math.random() * polygonColors.length)]
-    });
-
-    renderManager.addInstance({
-      name: 'hexagon',
-      rotation: i * 2 * Math.PI / 360.0,
-      size: Math.random() * (maxSize - minSize) + minSize,
-      offset: getRandCoord(canvas),
-      color: polygonColors[Math.floor(Math.random() * polygonColors.length)]
-    });
-
-    renderManager.addCircleInstance({
-      size: Math.random() * (maxSize - minSize) + minSize,
-      offset: getRandCoord(canvas),
-      color: polygonColors[Math.floor(Math.random() * polygonColors.length)]
-    });
-
+    renderManager.addInstance({name: 'star', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
+    renderManager.addInstance({name: 'square', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
+    renderManager.addInstance({name: 'triangle', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
+    renderManager.addInstance({name: 'pentagon', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
+    renderManager.addInstance({name: 'hexagon', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
+    renderManager.addCircleInstance({size: size.x, offset: getRandCoord(canvas), color: color});
   }
 
   let elapsed = performance.now() - time;

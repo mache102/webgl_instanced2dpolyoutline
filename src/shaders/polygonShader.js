@@ -17,7 +17,7 @@ in float a_index;
 in vec2 a_coord;
 in float a_outline_direction;
 in float a_rotation;
-in float a_size;
+in vec2 a_size;
 in vec2 a_offset;
 in vec4 a_color;
 
@@ -46,15 +46,12 @@ void main(void) {
   vec2 half_winres = u_winres / 2.0;
   v_offset = vec2(0.);
 
-  vec2 coord;
+  vec2 coord = rotateVec2(a_coord * a_size, a_rotation) + a_offset;
   float z = a_index;
   if (u_draw_outline == DRAW_REGULAR) {
-
-    coord = rotateVec2(a_coord, a_rotation) * a_size + a_offset;
     z /= u_polygon_count;  
 
   } else if (u_draw_outline == DRAW_OUTLINE) {
-    coord = rotateVec2(a_coord, a_rotation) * a_size + a_offset;
     coord += vec2(
       cos(a_outline_direction + a_rotation), 
       sin(a_outline_direction + a_rotation)
@@ -62,7 +59,6 @@ void main(void) {
     z = (z - 0.5) / u_polygon_count;
 
   } else { // DRAW_OUTLINE_CORNER
-    coord = rotateVec2(a_coord, a_rotation) * a_size + a_offset;
     v_offset = coord + half_winres;
 
     coord += vec2(
@@ -70,7 +66,6 @@ void main(void) {
       sin(a_outline_direction)
     ) * u_outline_size * SQRT2;
     z = (z - 0.5) / float(u_polygon_count); 
-
     
   }
 
