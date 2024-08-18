@@ -178,4 +178,16 @@ export class InstancedRender {
       this.circleRenderer.updateAllBuffers();
     }
   }
+
+  getPolygonCount() {
+    let count = 0;
+    this.rendererMap.forEach((renderer) => {
+      count += renderer.getPolygonCount();
+    });
+
+    if (this.circleRenderer) {
+      count += this.circleRenderer.getPolygonCount();
+    }
+    return count;
+  }
 }

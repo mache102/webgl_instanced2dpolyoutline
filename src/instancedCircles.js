@@ -118,4 +118,8 @@ export class InstancedCircles  {
 
   }
 
+  getPolygonCount() {
+    return this.indexs.length;
+  }
+
 }

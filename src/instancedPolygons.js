@@ -203,4 +203,8 @@ export class InstancedPolygons  {
     this.updateCornerBuffers();
     this.gl.drawArraysInstanced(this.gl.TRIANGLES, 0, this.cornerCoords.length / 2, instanceCount);
   }
+
+  getPolygonCount() {
+    return this.indexs.length;
+  }
 }

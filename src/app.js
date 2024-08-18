@@ -105,15 +105,35 @@ function renderLoop(timestamp) {
 
 function update() {
   // iterate over renderermap
-  for (let [name, renderer] of renderManager.rendererMap) {
-    for (let i = 0; i < renderer.rotations.length; i++) {
-      renderer.rotations[i] += 0.1;
-      if (renderer.rotations[i] > 2 * Math.PI) {
-        renderer.rotations[i] -= 2 * Math.PI;
-      }
-    }
-    renderer.updateRotationBuffer();
+  // for (let [name, renderer] of renderManager.rendererMap) {
+  //   for (let i = 0; i < renderer.rotations.length; i++) {
+  //     renderer.rotations[i] += 0.1;
+  //     if (renderer.rotations[i] > 2 * Math.PI) {
+  //       renderer.rotations[i] -= 2 * Math.PI;
+  //     }
+  //   }
+  //   renderer.updateRotationBuffer();
+  // }
+
+  let time = performance.now();
+  renderManager.clearAll();
+  for (let i = 0; i < polygonCount; i++) {
+    let rotation = i * 2 * Math.PI / 360.0;
+    let size = new vec2(Math.random() * (maxSize - minSize) + minSize, Math.random() * (maxSize - minSize) + minSize);
+    let color = polygonColors[Math.floor(Math.random() * polygonColors.length)];
+
+    renderManager.addInstance({name: 'star', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
+    renderManager.addInstance({name: 'square', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
+    renderManager.addInstance({name: 'triangle', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
+    renderManager.addInstance({name: 'pentagon', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
+    renderManager.addInstance({name: 'hexagon', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
+    renderManager.addCircleInstance({size: size.x, offset: getRandCoord(canvas), color: color});
   }
+  renderManager.updateAllBuffers();
+
+  let elapsed = performance.now() - time;
+  console.log(`Time to add ${renderManager.getPolygonCount()} polygons: ${elapsed.toFixed(4)} ms (avg: ${(1000 * elapsed / polygonCount).toFixed(4)} us)`);
+
 }
 
 function draw() {
@@ -186,24 +206,7 @@ function init() {
   let hexagonShader = new Shader(gl, polygonShader_vert, polygonShader_frag);
   renderManager.addRenderer('hexagon', hexagonVertices, gl, hexagonShader);
 
-  let time = performance.now();
-  for (let i = 0; i < polygonCount; i++) {
-    let rotation = i * 2 * Math.PI / 360.0;
-    let size = new vec2(Math.random() * (maxSize - minSize) + minSize, Math.random() * (maxSize - minSize) + minSize);
-    let color = polygonColors[Math.floor(Math.random() * polygonColors.length)];
-
-    renderManager.addInstance({name: 'star', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
-    renderManager.addInstance({name: 'square', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
-    renderManager.addInstance({name: 'triangle', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
-    renderManager.addInstance({name: 'pentagon', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
-    renderManager.addInstance({name: 'hexagon', rotation: rotation, size: size, offset: getRandCoord(canvas), color: color});
-    renderManager.addCircleInstance({size: size.x, offset: getRandCoord(canvas), color: color});
-  }
-
-  let elapsed = performance.now() - time;
-  console.log(`Time to add ${polygonCount} polygons: ${elapsed} ms (avg: ${elapsed / polygonCount} ms)`);
-
-  renderManager.updateAllBuffers();
+  update();
 
   resizeCanvasToDisplaySize(canvas);
   const canvasSizeText = document.getElementById('canvas-size-text');
